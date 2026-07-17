@@ -13,6 +13,10 @@ Most SOC home labs stop at "I installed a SIEM." This one goes further: every at
 
 The lab also documents what *didn't* work and why — because diagnosing a detection gap is as much a SOC skill as building one.
 
+![Custom rule firing in Wazuh Dashboard](01-custom-rule-firing.jpeg)
+
+*Custom rule 100002 detecting hidden PowerShell execution — specific description and Level 12 severity, replacing the generic built-in alert.*
+
 ---
 
 ## Environment
@@ -48,6 +52,14 @@ All simulations use **benign payloads** (e.g. `Write-Host`, `calc.exe`) that gen
 **Finding:** Wazuh's built-in rule 92057 already detects this precisely, with correct MITRE mapping and Level 12 severity. **No custom rule needed** — writing one would only duplicate coverage and add noise.
 
 > **Lesson:** Always check existing rule coverage *before* writing a custom rule.
+>
+> ![Encoded PowerShell detection](04-encoded-detection.jpeg)
+
+*Built-in rule 92057 detecting the Base64-encoded command.*
+
+![Event details](05-event-details.jpeg)
+
+*Full telemetry captured: agent, command line, and file hashes.*
 > ---
 
 ### 2. Hidden PowerShell Window ⭐ *Custom Rule*
@@ -82,6 +94,14 @@ powershell.exe -WindowStyle Hidden -Command "Write-Host 'test hidden'"
 - `if_group` scoped to `sysmon_eid1_detections` → the rule only evaluates process-creation events, not every event Wazuh sees.
 
 **Result:** ✅ Tested and confirmed working — alert fires with the specific description and Level 12 severity instead of the generic built-in message.
+
+![Custom rule code](02-custom-rule-code.jpeg)
+
+*Rule 100002 as written in `/var/ossec/etc/rules/local_rules.xml`.*
+
+![Attack execution](03-attack-execution.jpeg)
+
+*Simulating the hidden-window attack from PowerShell.*
 
 **Before vs. after:**
 
